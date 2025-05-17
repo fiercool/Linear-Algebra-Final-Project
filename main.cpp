@@ -4,7 +4,6 @@
 
 using namespace std;
 
-//define functions
 void EnterMatrix();
 void DisplayMatrix(apmatrix<double> Matrix);
 apmatrix<double> LoadMatrix(int n);
@@ -13,7 +12,7 @@ apmatrix<double> AddMatrices(apmatrix<double> Temp1, apmatrix<double> Temp2);
 apmatrix<double> MultiplyMatrices(apmatrix<double> Temp1, apmatrix<double> Temp2);
 apmatrix<double> RowReduceMatrix(apmatrix<double> Matrix);
 apmatrix<double> InvertMatrix(apmatrix<double> Matrix);
-apmatrix<double> OLSRegression(apmatrix<double> X, apmatrix<double> y); 
+apmatrix<double> OLS(apmatrix<double> M, apmatrix<double> y); 
 
 
 apmatrix<double> Matrices[6];  
@@ -260,7 +259,7 @@ apmatrix<double> RowReduceMatrix(apmatrix<double> Matrix) {
             }
         }
 
-        //if abs of highest pivot = 0 (w/ tolerance for floating point), skip column
+        //if abs of highest pivot = 0, skip column
         if (max_val < 0.0000001) {
             pivot_col++;
             continue;
@@ -307,9 +306,9 @@ apmatrix<double> RowReduceMatrix(apmatrix<double> Matrix) {
 
         // eliminate above pivot
         for (int k = i - 1; k >= 0; --k) {
-            double factor = Result[k][lead_col];
+            double scale = Result[k][lead_col];
             for (int j = 0; j < cols; ++j) {
-                Result[k][j] -= factor * Result[i][j];
+                Result[k][j] -= scale * Result[i][j];
             }
         }
     }
@@ -345,12 +344,13 @@ apmatrix<double> InvertMatrix(apmatrix<double> Matrix) {
     return Inv;
 }
 
-apmatrix<double> OLSRegression(apmatrix<double> X, apmatrix<double> y) {
-    //(X^T X)^{-1} X^T y
-    apmatrix<double> Xt = TransposeMatrix(X);
-    apmatrix<double> XtX = MultiplyMatrices(Xt, X);
-    apmatrix<double> XtX_inv = InvertMatrix(XtX);
-    apmatrix<double> Xt_y = MultiplyMatrices(Xt, y);
-    apmatrix<double> Beta = MultiplyMatrices(XtX_inv, Xt_y);
-    return Beta;
+apmatrix<double> OLS(apmatrix<double> M, apmatrix<double> y) {
+    //(M^T M)^{-1} M^T y
+
+    apmatrix<double> Mt = TransposeMatrix(M);
+    apmatrix<double> MtM = MultiplyMatrices(Mt, M);
+    apmatrix<double> MtM_inv = InvertMatrix(MtM);
+    apmatrix<double> Mt_y = MultiplyMatrices(Mt, y);
+    apmatrix<double> Z = MultiplyMatrices(MtM_inv, Mt_y);
+    return Z;
 }

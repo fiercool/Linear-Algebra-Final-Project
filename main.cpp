@@ -22,6 +22,7 @@ int main() {
     int choice, whichmatrix;
     int keepgoing = 0;
     apmatrix<double> Temp, Temp1, Result;
+    apmatrix<double> x, y, xmatrix;
 
     cout << "Welcome to Tanish's Magical Matrix Program!\n\n";
 
@@ -93,19 +94,58 @@ int main() {
                 Result = InvertMatrix(Temp);
                 DisplayMatrix(Result);
                 break;
-            case 8: 
-                
-                cout << "\nWhich matrix is matrix X? (choose Matrix 1-6)==> ";
-                cin >> whichmatrix1;
-                Temp = LoadMatrix(whichmatrix1);
-                cout << "\nWhich matrix is the vector y? (choose Matrix 1-6)==> ";
-                cin >> whichmatrix2;
-                Temp1 = LoadMatrix(whichmatrix2);
-                Result = OLSRegression(Temp, Temp1);
-                DisplayMatrix(Result);
+            case 8: {
+                int degree, datapoints;
+                cout << "\nWhat is the degree of your polynomial? ==> ";
+                cin >> degree;
+
+                cout << "\nHow many data points do you want to enter? ==> ";
+                cin >> datapoints;
+
+                apmatrix<double> coeffMatrix; 
+                apmatrix<double> yMatrix;
+
+                coeffMatrix.resize(datapoints, degree + 1);
+                yMatrix.resize(datapoints, 1);
+
+                for (int i = 0; i < datapoints; i++) {
+                    double x, y;
+                    cout << "Enter x value for point " << i + 1 << ": ";
+                    cin >> x;
+                    cout << "Enter y value for point " << i + 1 << ": ";
+                    cin >> y;
+
+                    yMatrix[i][0] = y;
+                    double x_pow = 1.0;
+                    for (int j = 0; j <= degree; j++) {
+                        coeffMatrix[i][j] = x_pow;
+                        x_pow *= x;
+                    }
+                }
+
+                apmatrix<double> result = OLS(coeffMatrix, yMatrix);
+
+                cout << "Your equation is: y = ";
+                for (int i = 0; i <= degree; i++) {
+                    double coeff = result[i][0];
+
+                    if (fabs(coeff) < 0.000001) {
+                        coeff = 0.0;
+                    }
+
+                    if (i == 0) {
+                        cout << coeff;
+                    } else {
+                        cout << " + " << coeff << "x^" << i;
+                    }
+                }
+                cout << endl;
+
                 break;
+            }
+                
             default:
-                cout << "Not an Option";
+                cout << "\nNot an Option";
                 continue;
         }
 
@@ -346,7 +386,6 @@ apmatrix<double> InvertMatrix(apmatrix<double> Matrix) {
 
 apmatrix<double> OLS(apmatrix<double> M, apmatrix<double> y) {
     //(M^T M)^{-1} M^T y
-
     apmatrix<double> Mt = TransposeMatrix(M);
     apmatrix<double> MtM = MultiplyMatrices(Mt, M);
     apmatrix<double> MtM_inv = InvertMatrix(MtM);

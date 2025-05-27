@@ -1,11 +1,14 @@
 #include <iostream>
 #include "apmatrix.h"
+#include "apvector.h"
 #include <cmath>
+#include <vector>
 
 using namespace std;
 
 void EnterMatrix();
 void DisplayMatrix(apmatrix<double> Matrix);
+
 apmatrix<double> LoadMatrix(int n);
 apmatrix<double> TransposeMatrix(apmatrix<double> Matrix);
 apmatrix<double> AddMatrices(apmatrix<double> Temp1, apmatrix<double> Temp2);
@@ -13,7 +16,7 @@ apmatrix<double> MultiplyMatrices(apmatrix<double> Temp1, apmatrix<double> Temp2
 apmatrix<double> RowReduceMatrix(apmatrix<double> Matrix);
 apmatrix<double> InvertMatrix(apmatrix<double> Matrix);
 apmatrix<double> OLS(apmatrix<double> M, apmatrix<double> y); 
-
+apmatrix<double> QRAlgorithm(apmatrix<double> A); 
 
 apmatrix<double> Matrices[6];  
 int enternumber = 0;
@@ -36,6 +39,7 @@ int main() {
         cout << "6. Row Reduce a Matrix\n";
         cout << "7. Invert a Matrix\n";
         cout << "8. OLS Regression\n";
+        cout << "9. QR Algorithm\n";
         cout << "What do you choose? (type a number 1-8) ==> ";
         cin >> choice;
 
@@ -141,6 +145,14 @@ int main() {
                 }
                 cout << endl;
 
+                break;
+            }
+
+            case 9: {
+                cout << "Which matrix do you want to find eigenvalues of (choose Matrix 1-6)? ";
+                cin >> whichmatrix;
+                Temp = LoadMatrix(whichmatrix);
+                QRAlgorithm(Temp);
                 break;
             }
                 
@@ -393,3 +405,52 @@ apmatrix<double> OLS(apmatrix<double> M, apmatrix<double> y) {
     apmatrix<double> Z = MultiplyMatrices(MtM_inv, Mt_y);
     return Z;
 }
+
+apmatrix<double> QRAlgorithm(apmatrix<double> A) {
+    int n = A.numrows();
+    int maxIter = 100;
+    double tol = 0.00001;
+
+    apmatrix<double> Ak = A;
+
+    for (int iter = 0; iter < maxIter; ++iter) {
+        // Classical Gram-Schmidt
+        apmatrix<double> Q(n, n);
+        apmatrix<double> R(n, n);
+
+        for (int j = 0; j < n; ++j) {
+            for (int i = 0; i < n; ++i)
+                Q[i][j] = Ak[i][j];
+
+            for (int k = 0; k < j; ++k) {
+                double dot = 0.0;
+                for (int i = 0; i < n; ++i)
+                    dot += Q[i][k] * Ak[i][j];
+
+                R[k][j] = dot;
+                for (int i = 0; i < n; ++i)
+                    Q[i][j] -= dot * Q[i][k];
+            }
+
+            double norm = 0.0;
+            for (int i = 0; i < n; ++i)
+                norm += Q[i][j] * Q[i][j];
+
+            R[j][j] = sqrt(norm);
+            for (int i = 0; i < n; ++i)
+                Q[i][j] /= R[j][j];
+        }
+
+        Ak = MultiplyMatrices(R, Q);
+    }
+
+
+    cout << "Estimated eigenvalues:\n";
+    for (int i = 0; i < n; ++i) {
+        cout << Ak[i][i] << endl;
+    }
+
+
+}
+
+

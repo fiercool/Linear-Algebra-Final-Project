@@ -17,6 +17,7 @@ apmatrix<double> RowReduceMatrix(apmatrix<double> Matrix);
 apmatrix<double> InvertMatrix(apmatrix<double> Matrix);
 apmatrix<double> OLS(apmatrix<double> M, apmatrix<double> y); 
 apmatrix<double> QRAlgorithm(apmatrix<double> A); 
+apmatrix<double> CholeskyDecomposition(apmatrix<double> A);
 
 
 apmatrix<double> Matrices[6];  
@@ -42,6 +43,8 @@ int main() {
         cout << "8. OLS Regression\n";
         cout << "9. QR Algorithm\n";
         cout << "10. Estimate solution to a system\n";
+        cout << "11. CholeskyDecomposition\n";
+"
         cout << "What do you choose? (type a number 1-8) ==> ";
         cin >> choice;
 
@@ -176,6 +179,19 @@ int main() {
                 apmatrix<double> solution = OLS(A, b);
                 cout << "Estimated solution:\n";
                 DisplayMatrix(solution);
+                break;
+            }
+            case 11: {
+                cout << "Which matrix do you want to perform Cholesky Decomposition on (choose Matrix 1-6)? ";
+                cin >> whichmatrix;
+                Temp = LoadMatrix(whichmatrix);
+                if (Temp.numrows() != Temp.numcols()) {
+                    cout << "Cholesky Decomposition requires a square matrix.\n";
+                    break;
+                }
+                apmatrix<double> L = CholeskyDecomposition(Temp);
+                cout << "Lower triangular matrix L:\n";
+                DisplayMatrix(L);
                 break;
             }
                 
@@ -475,4 +491,26 @@ apmatrix<double> QRAlgorithm(apmatrix<double> A) {
     return Ak;
 }
 
+apmatrix<double> CholeskyDecomposition(apmatrix<double> A) {
+    int n = A.numrows();
+    apmatrix<double> L(n, n);
 
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j <= i; ++j) {
+            double sum = 0.0;
+            for (int k = 0; k < j; ++k) {
+                sum += L[i][k] * L[j][k];
+            }
+
+            if (i == j) {
+                //diagonal L[i][i]
+                L[i][j] = sqrt(A[i][i] - sum);
+            } else {
+                // off-diagonal L[i][j]
+                L[i][j] = (A[i][j] - sum) / L[j][j];
+            }
+        }
+    }
+
+    return L;
+}

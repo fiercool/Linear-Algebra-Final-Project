@@ -18,6 +18,7 @@ apmatrix<double> InvertMatrix(apmatrix<double> Matrix);
 apmatrix<double> OLS(apmatrix<double> M, apmatrix<double> y); 
 apmatrix<double> QRAlgorithm(apmatrix<double> A); 
 
+
 apmatrix<double> Matrices[6];  
 int enternumber = 0;
 
@@ -40,6 +41,7 @@ int main() {
         cout << "7. Invert a Matrix\n";
         cout << "8. OLS Regression\n";
         cout << "9. QR Algorithm\n";
+        cout << "10. Estimate solution to a system\n";
         cout << "What do you choose? (type a number 1-8) ==> ";
         cin >> choice;
 
@@ -153,6 +155,27 @@ int main() {
                 cin >> whichmatrix;
                 Temp = LoadMatrix(whichmatrix);
                 QRAlgorithm(Temp);
+                break;
+            }
+
+            case 10: { 
+                int whichmatrix1, whichmatrix2;
+                cout << "\nWhat is the matrix of coefficients (choose Matrix 1-6)? ==> ";
+                cin >> whichmatrix1;
+                apmatrix<double> A = LoadMatrix(whichmatrix1);
+
+                cout << "\nWhat is the matrix of constants (choose Matrix 1-6)? ==> ";
+                cin >> whichmatrix2;
+                apmatrix<double> b =LoadMatrix(whichmatrix2);
+
+                if (A.numcols() != b.numrows() || A.numrows() != b.numcols()) {
+                    cout << "Coefficient matrix must be nxm and b must be nx1 \n";
+                    break;
+                }
+
+                apmatrix<double> solution = OLS(A, b);
+                cout << "Estimated solution:\n";
+                DisplayMatrix(solution);
                 break;
             }
                 
@@ -449,8 +472,7 @@ apmatrix<double> QRAlgorithm(apmatrix<double> A) {
     for (int i = 0; i < n; ++i) {
         cout << Ak[i][i] << endl;
     }
-
-
+    return Ak;
 }
 
 

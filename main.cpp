@@ -24,7 +24,7 @@ apmatrix<double> Matrices[6];
 int enternumber = 0;
 
 int main() {
-    int choice, whichmatrix;
+    int choice, selection, whichmatrix;
     int keepgoing = 0;
     apmatrix<double> Temp, Temp1, Result;
     apmatrix<double> x, y, xmatrix;
@@ -44,8 +44,9 @@ int main() {
         cout << "9. QR Algorithm\n";
         cout << "10. Estimate solution to a system\n";
         cout << "11. CholeskyDecomposition\n";
-"
-        cout << "What do you choose? (type a number 1-8) ==> ";
+        cout << "12. Shortest Distance between a point and a line, line/line, point/plane.";
+
+        cout << "What do you choose? (type a number 1-12) ==> ";
         cin >> choice;
 
         switch (choice) {
@@ -195,6 +196,44 @@ int main() {
                 break;
             }
                 
+            case 12: {
+
+
+                cout << "What would you like to do? \n\n";
+                cout << "1. Find the Shortest Distance between a point and a line";
+                cout << "2. Find the Shortest Distance between a line and a line";
+                cout << "3. Find the Shortest Distance between a plane/plane";
+                cout << "What do you choose? (type a number 1-3) ==> ";
+
+                cin >> selection; 
+                switch (selection) {
+                
+                case 1: {
+                    int x, y, x1, x2, c;
+
+                    cout << "What is the x coordinate of your point?";
+                    cin >> x;
+                    cout << "What is the y coordinate of your point?"; 
+                    cin >> y; 
+                    
+                    cout << "In the form y = mx+b"
+                    
+
+                }
+
+                case 2: {
+
+                }
+
+                case 3 { 
+
+                }
+
+
+                }
+
+
+            }
             default:
                 cout << "\nNot an Option";
                 continue;

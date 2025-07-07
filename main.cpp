@@ -19,6 +19,14 @@ apmatrix<double> OLS(apmatrix<double> M, apmatrix<double> y);
 apmatrix<double> QRAlgorithm(apmatrix<double> A); 
 apmatrix<double> CholeskyDecomposition(apmatrix<double> A);
 
+apvector<double> CrossProduct(const apvector<double>& u, const apvector<double>& v);
+
+
+void DistancePointToLine();
+void DistanceLineToLine();
+void DistancePointToPlane();
+
+
 
 apmatrix<double> Matrices[6];  
 int enternumber = 0;
@@ -44,7 +52,7 @@ int main() {
         cout << "9. QR Algorithm\n";
         cout << "10. Estimate solution to a system\n";
         cout << "11. CholeskyDecomposition\n";
-        cout << "12. Shortest Distance between a point and a line, line/line, point/plane.";
+        cout << "12. Shortest Distance between a point and a line, line/line, point/plane.\n";
 
         cout << "What do you choose? (type a number 1-12) ==> ";
         cin >> choice;
@@ -197,47 +205,35 @@ int main() {
             }
                 
             case 12: {
+            cout << "What would you like to do? \n\n";
+            cout << "1. Find the Shortest Distance between a point and a line\n";
+            cout << "2. Find the Shortest Distance between a line and a line\n";
+            cout << "3. Find the Shortest Distance between a point and a plane\n";
+            cout << "What do you choose? (type a number 1-3) ==> ";
+            cin >> selection;
 
-
-                cout << "What would you like to do? \n\n";
-                cout << "1. Find the Shortest Distance between a point and a line";
-                cout << "2. Find the Shortest Distance between a line and a line";
-                cout << "3. Find the Shortest Distance between a plane/plane";
-                cout << "What do you choose? (type a number 1-3) ==> ";
-
-                cin >> selection; 
-                switch (selection) {
-                
-                case 1: {
-                    int x, y, x1, x2, c;
-
-                    cout << "What is the x coordinate of your point?";
-                    cin >> x;
-                    cout << "What is the y coordinate of your point?"; 
-                    cin >> y; 
-                    
-                    cout << "In the form y = mx+b"
-                    
-
-                }
-
-                case 2: {
-
-                }
-
-                case 3 { 
-
-                }
-
-
-                }
-
-
+            switch (selection) {
+                case 1:
+                    DistancePointToLine();
+                    break;
+                case 2:
+                    DistanceLineToLine();
+                    break;
+                case 3:
+                    DistancePointToPlane();
+                    break;
+                default:
+                    cout << "Invalid selection.\n";
             }
-            default:
-                cout << "\nNot an Option";
-                continue;
-        }
+
+            break;   
+
+        }  
+
+        default:
+            cout << "\nNot an Option";
+            continue;
+    }
 
         cout << "\n\nDo you want to keep going? (0=yes, 1=no) ==> ";
         cin >> keepgoing;
@@ -245,6 +241,8 @@ int main() {
 
     cout << "\n\nSee you next time.";
 }
+
+
 
 void EnterMatrix() {
     int rows, columns, i, j;
@@ -289,7 +287,7 @@ void DisplayMatrix(apmatrix<double> Matrix) {
             double val = Matrix[i][j];
             if (fabs(val) < .000001){
                 val = 0.0;
-            } // -1 fix
+            } // -0 fix
             cout << val << " ";
         }
         cout << endl;
@@ -492,7 +490,7 @@ apmatrix<double> QRAlgorithm(apmatrix<double> A) {
     apmatrix<double> Ak = A;
 
     for (int iter = 0; iter < maxIter; ++iter) {
-        // Classical Gram-Schmidt
+        //gram
         apmatrix<double> Q(n, n);
         apmatrix<double> R(n, n);
 
@@ -552,4 +550,159 @@ apmatrix<double> CholeskyDecomposition(apmatrix<double> A) {
     }
 
     return L;
+}
+
+
+void DistancePointToLine() {
+    //honestly not sure if this is supposed to be in 3 dimentions, all the examples of questions in the textbook were 3d so i figured id just do it like that.
+   
+    double Ax, Ay, Az, vx, vy, vz, Px, Py, Pz;
+
+    cout << "What is the x-coordinate of point A on the line? ==> ";
+    cin >> Ax;
+    cout << "What is the y-coordinate of point A on the line? ==> ";
+    cin >> Ay;
+    cout << "What is the z-coordinate of point A on the line? ==> ";
+    cin >> Az;
+
+    cout << "What is the x-component of the direction vector v of the line? ==> ";
+    cin >> vx;
+    cout << "What is the y-component of the direction vector v of the line? ==> ";
+    cin >> vy;
+    cout << "What is the z-component of the direction vector v of the line? ==> ";
+    cin >> vz;
+
+    cout << "What is the x-coordinate of point P? ==> ";
+    cin >> Px;
+    cout << "What is the y-coordinate of point P? ==> ";
+    cin >> Py;
+    cout << "What is the z-coordinate of point P? ==> ";
+    cin >> Pz;
+
+    //AP = P - A
+    double APx = Px - Ax;
+    double APy = Py - Ay;
+    double APz = Pz - Az;
+
+
+    //proj_v(AP) = [(AP ⋅ v) / (v ⋅ v)] * v
+    double dot_AP_v = APx * vx + APy * vy + APz * vz;
+    double v_dot_v = vx * vx + vy * vy + vz * vz;
+
+    
+    double scalar = dot_AP_v / v_dot_v;
+    double projx = scalar * vx;
+    double projy = scalar * vy;
+    double projz = scalar * vz;
+
+    //  AP - proj_v(AP)
+    double perp_x = APx - projx;
+    double perp_y = APy - projy;
+    double perp_z = APz - projz;
+
+    // mag of perp
+    double distance = sqrt(perp_x * perp_x + perp_y * perp_y + perp_z * perp_z);
+
+    cout << "The shortest distance from point P to the line is: " << distance << endl;
+}
+
+void DistanceLineToLine() {
+    double A1x, A1y, A1z, v1x, v1y, v1z, A2x, A2y, A2z, v2x, v2y, v2z;
+
+    cout << "Enter the x-coordinate of point A1 on line 1: ==> ";
+    cin >> A1x;
+    cout << "Enter the y-coordinate of point A1 on line 1: ==> ";
+    cin >> A1y;
+    cout << "Enter the z-coordinate of point A1 on line 1: ==> ";
+    cin >> A1z;
+
+    cout << "Enter the x-component of direction vector v1: ==> ";
+    cin >> v1x;
+    cout << "Enter the y-component of direction vector v1: ==> ";
+    cin >> v1y;
+    cout << "Enter the z-component of direction vector v1: ==> ";
+    cin >> v1z;
+
+    cout << "Enter the x-coordinate of point A2 on line 2: ==> ";
+    cin >> A2x;
+    cout << "Enter the y-coordinate of point A2 on line 2: ==> ";
+    cin >> A2y;
+    cout << "Enter the z-coordinate of point A2 on line 2: ==> ";
+    cin >> A2z;
+
+    cout << "Enter the x-component of direction vector v2: ==> ";
+    cin >> v2x;
+    cout << "Enter the y-component of direction vector v2: ==> ";
+    cin >> v2y;
+    cout << "Enter the z-component of direction vector v2: ==> ";
+    cin >> v2z;
+
+
+    double Cx = v1y * v2z - v1z * v2y;
+    double Cy = v1z * v2x - v1x * v2z;
+    double Cz = v1x * v2y - v1y * v2x;
+
+    double crossMag = sqrt(Cx * Cx + Cy * Cy + Cz * Cz);
+
+  -
+    if (fabs(crossMag) < 0.00001) {
+        
+        cout << "Lines are parallel or intersect. \n";
+        return;
+    }
+
+    double diffx = A2x - A1x;
+    double diffy = A2y - A1y;
+    double diffz = A2z - A1z;
+
+    double dot = diffx * Cx + diffy * Cy + diffz * Cz;
+
+    double distance = fabs(dot) / crossMag;
+
+    cout << "The shortest distance between the two lines is: " << distance << endl;
+}
+
+
+
+void DistancePointToPlane() {
+    double A, B, C, D, Px, Py, Pz;
+
+    cout << "What is the A value in the equation Ax + By + Cz + D = 0? ==> ";
+    cin >> A;
+    cout << "What is the B value in the equation Ax + By + Cz + D = 0? ==> ";
+    cin >> B;
+    cout << "What is the C value in the equation Ax + By + Cz + D = 0? ==> ";
+    cin >> C;
+    cout << "What is the D value in the equation Ax + By + Cz + D = 0? ==> ";
+    cin >> D;
+
+    double norm_n_sq = A*A + B*B + C*C;
+    double Qx, Qy, Qz;
+
+    if (fabs(C) > 0.000001) {
+        Qx = 0.0;
+        Qy = 0.0;
+        Qz = D / C;
+    } else if (fabs(B) > 0.000001) {
+        Qx = 0.0;
+        Qz = 0.0;
+        Qy = D / B;
+    } else {
+        Qy = 0.0;
+        Qz = 0.0;
+        Qx = D / A;
+    }
+    
+    cout << "Enter the x-coordinate of point P: ==> ";
+    cin >> Px;
+    cout << "Enter the y-coordinate of point P: ==> ";
+    cin >> Py;
+    cout << "Enter the z-coordinate of point P: ==> ";
+    cin >> Pz;
+
+   
+    double dot_PQ_n = Px * A + Py * B + Pz * C + D;
+    double norm_n = sqrt(norm_n_sq);
+    double distance = fabs(dot_PQ_n) / norm_n;
+    cout << "The shortest distance from point P to the plane is: " << distance << endl;
 }
